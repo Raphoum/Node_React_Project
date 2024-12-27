@@ -2,21 +2,18 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 
 interface LoginProps {
-  onLogin: (userData: any) => void; // Fonction pour gérer la connexion
-  onSignup: () => void; // Fonction pour basculer vers la page d'inscription
+  onLogin: (userData: any) => void;
+  onSignup: () => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin, onSignup }) => {
-  // États pour les champs et erreurs
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
 
-  // Références pour les champs de saisie
   const emailRef = useRef<HTMLInputElement >(null);
-  const passwordRef = useRef<HTMLInputElement >(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
-  // Fonction pour gérer la connexion
   const handleLogin = async (): Promise<void> => {
     try {
       setError('');
@@ -26,7 +23,6 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSignup }) => {
       });
       const userData = response.data;
 
-      // Vérification si l'utilisateur est un admin (email spécifique)
       userData.isAdmin = email.toLowerCase().trim() === 'admin@exemple.com';
 
       onLogin(userData);
@@ -37,14 +33,13 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSignup }) => {
 
   
 
-  // Fonction pour gérer la touche "Enter"
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, nextFieldRef?: React.RefObject<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (nextFieldRef?.current) {
-        nextFieldRef.current.focus(); // Passe au champ suivant
+        nextFieldRef.current.focus(); 
       } else {
-        handleLogin(); // Valide le formulaire
+        handleLogin(); 
       }
     }
   };
@@ -70,7 +65,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSignup }) => {
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e, passwordRef)} // Passe au champ suivant
+                    onKeyDown={(e) => handleKeyDown(e, passwordRef)}
                   />
                   <span className="icon is-small is-left">
                     <i className="fas fa-envelope"></i>
@@ -87,7 +82,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSignup }) => {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e)} // Valide la connexion
+                    onKeyDown={(e) => handleKeyDown(e)}
                   />
                   <span className="icon is-small is-left">
                     <i className="fas fa-lock"></i>
