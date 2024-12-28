@@ -263,6 +263,6 @@ npm start
 4. **SQL Query**: Execute custom SQL queries in the provided query section.
 
 ## Author
-- Romain REQUENA
-- Raphael ROUX
-- Léonard SEIDLITZ
+- Romain REQUENA https://github.com/Tailroil
+- Raphael ROUX  https://github.com/Raphoum
+- Léonard SEIDLITZ  https://github.com/TartineLibre
