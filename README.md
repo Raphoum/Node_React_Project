@@ -265,4 +265,4 @@ npm start
 ## Author
 - Romain REQUENA https://github.com/Tailroil
 - Raphael ROUX  https://github.com/Raphoum
-- Léonard SEIDLITZ  https://github.com/TartineLibre
+- Léonard SEIDLITZ  https://github.com/TartineLibre 
