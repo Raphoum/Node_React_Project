@@ -6,10 +6,10 @@ import AdminPanel from './/components/AdminPanel';
 import UserPanel from './/components/UserPanel';
 
 interface User {
-    user_id: string;
+    user_id: number;
     name: string;
     email: string;
-    age: string;
+    age: number;
     role: string;
 }
 

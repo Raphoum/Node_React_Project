@@ -98,6 +98,9 @@ app.post('/rental', async (req: Request<{}, {}, RentalRequest>, res: Response) =
     res.status(201).send({ message: 'Rental created successfully!' });
   } catch (error: any) {
     console.error('Error creating rental:', error);
+    if (error.errorNum === 20002) {
+      return res.status(409).send({ error: 'Movie already rented.' });
+    }
     res.status(500).send({ error: error.message });
   } finally {
     await closeConnection(connection);
@@ -197,6 +200,7 @@ app.post('/submit-rating', async (req: Request<{}, {}, RatingRequest>, res: Resp
   let connection;
   try {
     connection = await oracledb.getConnection(dbConfig);
+    await connection.execute("ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '. '");
     const query = `
       INSERT INTO Rating (user_id, movie_id, rating_value, review)
       VALUES (:user_id, :movie_id, :rating_value, :review)

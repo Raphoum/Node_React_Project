@@ -18,15 +18,15 @@ interface Movie {
   release_date: string;
   runtime: number;
   tagline: string;
-  vote_average: number;
+  vote_average: string;
   vote_count: number;
-  adult: boolean;
+  adult: string;
 }
 
 interface Rental {
   rental_id: number;
-  rental_date: string;
-  end_date: string | null;
+  rental_date: Date;
+  end_date: Date | null;
   movie_id: number;
   movie_title: string;
   runtime: string | null;
@@ -90,6 +90,31 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
     }
   };
 
+  const rentMovie = async () => {
+    if (!selectedMovie) return;
+  
+    try {
+      setError('');
+      const rentalDate = new Date().toISOString();
+      await axios.post('http://localhost:5000/rental', {
+        user_id: user.user_id,
+        movie_id: selectedMovie.movie_id,
+        rental_date: rentalDate
+      });
+  
+      alert(`Movie "${selectedMovie.title}" rented successfully!`);
+      setSelectedMovie(null);
+      fetchLocations();
+    } catch (err:any) {
+
+      if (err.response?.status === 409) {
+        alert(err.response.data.error); // Affiche "Cet utilisateur a déjà loué ce film actuellement."
+      } else {
+      setError('Error during the location of the movie.');
+      }
+    }
+  };
+
   // Update personal information
   const updatePersonalInfo = async () => {
     try {
@@ -122,41 +147,76 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
   };
 
   // Submit rating and review
-  const submitRating = async (rentalId: number) => {
+  const submitRating = async (rentalId: any) => {
     try {
       setError('');
+  
+      const rental = locations.find((loc) => loc.rental_id === rentalId);
+      const movieId = rental ? rental.movie_id : null;
+  
       await axios.post('http://localhost:5000/submit-rating', {
         user_id: user.user_id,
-        movie_id: rentalId,
-        rating_value: parseInt(rating),
+        movie_id: movieId,
+        rating_value: rating,
         review,
       });
-      alert('Rating and review submitted successfully!');
+  
+      alert('Rating and review added successfully!');
       setRating('');
       setReview('');
-      fetchLocations(); // Refresh locations
-    } catch (err: any) {
-      setError('Error submitting the rating.');
+      fetchLocations();
+    } catch (err:any) {
+      console.error('Error submitting the rating. :', err.response?.data?.error || err.message);
+      setError(err.response?.data?.error || 'Error submitting rating and review.');
     }
   };
 
   // Fetch movies when searching
   useEffect(() => {
     const fetchMovies = async () => {
-      if (!movieSearch.trim()) {
+      console.log("Recherche déclenchée pour :", movieSearch);
+      if (movieSearch.trim() === '') {
+        console.log("Champ de recherche vide, réinitialisation de movies.");
         setMovies([]);
         return;
       }
       try {
-        const response = await axios.post('http://localhost:5000/execute-sql', {
-          query: `SELECT * FROM Movie WHERE title LIKE '%${movieSearch}%'`,
-        });
-        setMovies(response.data.result || []);
-      } catch (err: any) {
-        setError('Error fetching movies.');
+        setError('');
+        const query = `SELECT * FROM Movie WHERE LOWER(title) LIKE '%${movieSearch.toLowerCase()}%'`;
+        console.log("Requête SQL envoyée :", query);
+  
+        const response = await axios.post('http://localhost:5000/execute-sql', { query });
+        console.log("Réponse reçue du serveur :", response);
+  
+        // Mapper les résultats pour uniformiser les clés
+        const moviesResult = response.data?.result.map((movie:any) => ({
+          movie_id: movie.MOVIE_ID,
+          title: movie.TITLE,
+          original_language: movie.ORIGINAL_LANGUAGE,
+          overview: movie.OVERVIEW,
+          popularity: movie.POPULARITY,
+          release_date: movie.RELEASE_DATE,
+          runtime: movie.RUNTIME,
+          tagline: movie.TAGLINE,
+          vote_average: movie.VOTE_AVERAGE,
+          vote_count: movie.VOTE_COUNT,
+          adult: movie.ADULT
+        })) || [];
+  
+        console.log("Résultat extrait après mapping :", moviesResult);
+        setMovies(moviesResult);
+      } catch (err) {
+        console.error("Erreur lors de la recherche :", err);
+        setError('Erreur lors de la recherche de films.');
+        setMovies([]);
       }
     };
-    fetchMovies();
+  
+    const delayDebounceFn = setTimeout(() => {
+      fetchMovies();
+    }, 300);
+  
+    return () => clearTimeout(delayDebounceFn);
   }, [movieSearch]);
 
   return (
@@ -235,6 +295,8 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
                           type="number"
                           placeholder="Rating (0-10)"
                           value={rating}
+                          max="10" 
+                          min="0" 
                           onChange={(e) => setRating(e.target.value)}
                         />
                         <textarea
@@ -245,7 +307,13 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
                         ></textarea>
                         <button
                           className="button is-warning is-small"
-                          onClick={() => submitRating(loc.rental_id)}
+                          onClick={() => {
+                            if (parseInt(rating, 10) < 0 || parseInt(rating, 10) > 10) {
+                              setError('Please enter a rating between 0 and 10');
+                              return;
+                            }
+                            submitRating(loc.rental_id);
+                          }}
                         >
                           Submit
                         </button>
@@ -375,7 +443,6 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
   </section>
 )}
 
-      {/* Search a movie */}
       <section className="section">
         <div className="box">
           <h2 className="subtitle">Search for a movie</h2>
@@ -387,16 +454,58 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
             onChange={(e) => setMovieSearch(e.target.value)}
           />
           {movies.length > 0 && (
-            <ul>
+            <ul style={{ listStyleType: 'none', padding: 0, marginTop: '10px' }}>
               {movies.map((movie) => (
-                <li key={movie.movie_id}>
-                  <strong>{movie.title}</strong> ({movie.release_date})
+                <li
+                  key={movie.movie_id}
+                  style={{
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    marginBottom: '5px',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s',
+                  }}
+                  onClick={() => setSelectedMovie(movie)}
+                >
+                  <strong>{movie.title}</strong> (
+                  {new Date(movie.release_date).getFullYear()})
+                  <p>
+                    <em>{movie.tagline || 'Pas de tagline'}</em>
+                  </p>
+                  <p>
+                    Langue : {movie.original_language} | Durée : {movie.runtime} min
+                  </p>
+                  <p>
+                    Note : {movie.vote_average} ({movie.vote_count} votes)
+                  </p>
+                  <p>Popularity : {movie.popularity}</p>
                 </li>
               ))}
             </ul>
           )}
         </div>
       </section>
+
+      {selectedMovie && (
+        <section className="section">
+          <div className="box">
+            <h2 className="subtitle">Confirm rental</h2>
+            <p>
+              Movie selected : <strong>{selectedMovie.title}</strong>
+            </p>
+            <button className="button is-primary" onClick={rentMovie}>
+              Rent this movie
+            </button>
+            <button
+              className="button is-light"
+              onClick={() => setSelectedMovie(null)}
+            >
+              Cancel
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* Logout */}
       <section className="section">

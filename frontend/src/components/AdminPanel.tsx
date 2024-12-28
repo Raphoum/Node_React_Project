@@ -1,5 +1,7 @@
 import React, { JSX, useState } from 'react';
 import axios from 'axios';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 
 interface AdminPanelProps {
   user: User|null;
@@ -14,14 +16,69 @@ interface User {
   role:string;
 }
 
-
 interface TableRow {
-  [key: string]: any; // Generic type for a table row with dynamic keys
+  [key: string]: any;
 }
 
 interface QueryResultRow {
-  [key: string]: any; // Same type for SQL query results
+  [key: string]: any; 
 }
+
+const renderHighChart = (data: { genre: string; count: number }[]): JSX.Element => {
+
+  if (data.length === 0) {
+    return (
+      <section className="section">
+        <h2 className="subtitle">Popular Movie Genres</h2>
+        <p>No data available to display.</p>
+      </section>
+    );
+  }
+
+  const options: Highcharts.Options = {
+    chart: {
+      type: 'column',
+    },
+    title: {
+      text: 'Number of Rentals by Genre',
+    },
+    xAxis: {
+      categories: data.map((d) => d.genre),
+      title: {
+        text: 'Genres',
+      },
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Number of Rentals',
+      },
+    },
+    series: [
+      {
+        name: 'Rentals',
+        type: 'column',
+        data: data.map((d) => ({
+          name: d.genre, 
+          y: d.count,   
+        })),
+        colorByPoint: true, 
+      },
+    ],
+    tooltip: {
+      formatter: function () {
+        return `<b>${this.key}</b>: ${this.y} rentals`;
+      },
+    },
+  };
+
+  return (
+    <section className="section">
+      <h2 className="subtitle">Popular Movie Genres</h2>
+      <HighchartsReact highcharts={Highcharts} options={options} />
+    </section>
+  );
+};
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ user, onLogout }) => {
   const [tableResult, setTableResult] = useState<TableRow[]>([]); // Table button results
@@ -29,20 +86,58 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user, onLogout }) => {
   const [error, setError] = useState<string>('');
   const [activeTable, setActiveTable] = useState<string>(''); // Active table for buttons
   const [query, setQuery] = useState<string>(''); // Custom SQL query
+  const [showChart, setShowChart] = useState<boolean>(false);
+  const [chartData, setChartData] = useState<{ genre: string; count: number }[]>([]);
+
 
   // Function to execute an SQL query for a table
   const fetchTableData = async (tableName: string): Promise<void> => {
     try {
       setError('');
-      setActiveTable(tableName); // Set the active table
+      setActiveTable(tableName); 
       const response = await axios.post('http://localhost:5000/execute-sql', {
         query: `SELECT * FROM ${tableName}`,
       });
-      setTableResult(response.data.result); // Store table data
+      setTableResult(response.data.result);
     } catch (err: any) {
       setError(`Error fetching data for ${tableName}.`);
     }
   };
+
+  const loadChartData = async () => {
+    try {
+      const data = await fetchRentalDataByGenre();
+      const transformedData = data.map((item) => ({
+        genre: item.GENRE,
+        count: item.COUNT,
+      }));
+      setChartData(transformedData);
+      setShowChart(!showChart);
+    } catch (err) {
+      console.error('Error loading chart data:', err);
+    }
+  };
+
+  const fetchRentalDataByGenre = async (): Promise<{ GENRE: string; COUNT: number }[]> => {
+    try {
+      const response = await axios.post('http://localhost:5000/execute-sql', {
+        query: `
+          SELECT g.genre_name AS genre, COUNT(r.rental_id) AS count
+          FROM Genre g
+          JOIN Movie_Genre mg ON g.genre_id = mg.genre_id
+          JOIN Rental r ON mg.movie_id = r.movie_id
+          GROUP BY g.genre_name
+          ORDER BY count DESC
+        `,
+      });
+      console.log(response.data.result);
+      return response.data.result; // Return the rental data by genre
+    } catch (err: any) {
+      console.error('Error fetching rental data by genre:', err);
+      throw new Error('Failed to fetch data');
+    }
+  };
+  
 
   // Function to delete a user
   const deleteUser = async (userId: string): Promise<void> => {
@@ -164,6 +259,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user, onLogout }) => {
           Logout
         </button>
       </div>
+
+      <div className="buttons is-centered">
+        <button className="button is-link" onClick={loadChartData}>
+          {showChart ? 'Hide Rentals by Genre' : 'Show Rentals by Genre'}
+        </button>
+      </div>
+
+      {showChart && renderHighChart(chartData)}
+      
 
       <div className="buttons is-centered">
         <button className="button is-link" onClick={() => fetchTableData('Users')}>
