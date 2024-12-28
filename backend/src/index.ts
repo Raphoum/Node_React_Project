@@ -215,7 +215,7 @@ app.post('/submit-rating', async (req: Request<{}, {}, RatingRequest>, res: Resp
   }
 });
 
-// Endpoint pour les notes (ratings)
+// Endpoint for the ratings
 app.get('/ratings', async (req, res) => {
     let connection;
     try {
@@ -235,7 +235,7 @@ app.get('/ratings', async (req, res) => {
     }
   });
   
-  // Endpoint pour les compagnies de production
+  // Endpoint for the production companies
   app.get('/production-companies', async (req, res) => {
     let connection;
     try {
@@ -256,7 +256,7 @@ app.get('/ratings', async (req, res) => {
   });
 
 
-// Endpoint pour les relations entre films et genres
+// Endpoint for the movie genres
 app.get('/movie-genres', async (req, res) => {
     let connection;
     try {
@@ -295,13 +295,10 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
       `;
       const result = await connection.execute(query, [email, password], { outFormat: oracledb.OUT_FORMAT_OBJECT });
   
-      // Vérifiez si `rows` est défini
       if (!result.rows || result.rows.length === 0) {
         return res.status(401).send({ error: 'Invalid email or password' });
       }
-  
-      // Extraire les données utilisateur
-      const user = result.rows[0] as {
+        const user = result.rows[0] as {
         USER_ID: number;
         NAME: string;
         EMAIL: string;
@@ -309,7 +306,6 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
         ROLE: string;
       };
   
-      // Retourne les informations utilisateur
       res.send({
         user_id: user.USER_ID,
         name: user.NAME,
@@ -332,7 +328,6 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
       return res.status(400).send({ error: 'All fields (name, email, age, role) are required' });
     }
   
-    // Vérifier si l'email est celui de l'administrateur
     if (email.toLowerCase() === 'admin@exemple.com') {
       return res.status(403).send({ error: 'Cannot create an account with the admin email' });
     }
@@ -341,7 +336,6 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
     try {
       connection = await oracledb.getConnection(dbConfig);
   
-      // Vérifier si l'email existe déjà dans la base de données
       const checkQuery = 'SELECT COUNT(*) AS count FROM Users WHERE email = :email';
       const checkResult = await connection.execute(checkQuery, [email], { outFormat: oracledb.OUT_FORMAT_OBJECT });
       if (!checkResult.rows || checkResult.rows.length === 0 || !checkResult.rows[0]) {
@@ -352,9 +346,7 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
         return res.status(400).send({ error: 'Email already exists' });
       }
 
-  
-      // Insérer le nouvel utilisateur dans la table Users
-      const insertQuery = `
+        const insertQuery = `
         INSERT INTO Users (name, email, age, role)
         VALUES (:name, :email, :age, :role)
       `;
