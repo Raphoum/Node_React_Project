@@ -5,6 +5,8 @@
 2. [Project Structure](#project-structure)
    - [Backend](#backend)
    - [Frontend](#frontend)
+   - [imgWebsite](#imgwebsite)
+   - [sqlDeveloper](#sqldeveloper)
 3. [Key Features](#key-features)
    - [Admin Panel](#admin-panel)
    - [Login and Registration](#login-and-registration)
@@ -72,6 +74,39 @@ The frontend is developed with **React.js** and **TypeScript**, providing an int
 - `src/sqlQuery.tsx`: Contains functions to execute SQL queries.
 - `src/index.tsx`: React entry point.
 - `src/index.css`: Stylesheet.
+
+---
+### imgWebsite
+The `imgWebsite` folder contains images used for presenting the website's design and features.  
+These images are present in this README file.
+
+**Files:**
+- `image.png`
+- `image-1.png`
+- `image-2.png`
+- `image-3.png`
+- `image-4.png`
+
+---
+
+### sqlDeveloper
+The `sqlDeveloper` folder contains Oracle SQL scripts used for database functions, table creation, queries, and optimizations.
+
+**Files:**
+- `Delete.sql`: Script for deleting records.
+- `drop.sql`: Script for dropping tables.
+- `Function.sql`: Custom Oracle functions.
+- `Insert.sql`: Script for inserting records.
+- `Optimization.sql`: Optimization-related scripts.
+- `Procedure.sql`: Stored procedures for various operations.
+- `Query.sql`: Predefined SQL queries for the application.
+- `RelationalSchemaSQL.png`: Diagram of the database schema.
+- `Security.sql`: Security-related scripts for database.
+- `Select.sql`: Select queries for data retrieval.
+- `Table.sql`: Scripts for creating tables.
+- `Trigger.sql`: SQL triggers for automating actions.
+- `Update.sql`: Scripts for updating records.
+- `movies_dataset_a_utiliser.csv`: Dataset used for populating the database.
 
 ---
 
