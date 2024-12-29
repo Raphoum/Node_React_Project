@@ -227,11 +227,16 @@ npm start
       *Email*: `admin@exemple.com`  
       *Password*: `admin`
 2. Depending on the email and password, you will be redirected to either the `AdminPanel` or the `UserPanel`.
+
+![alt text](image.png)
+
 ---
 ### SignUp
 - Register by providing your personal information.  
 - **Note**: You cannot create a user with an already registered email.  
 - After successful registration, return to the `Login` page using the provided button.
+
+![alt text](image-1.png)
 ---
 ### UserPanel
 1. **Logout**: Use the log-out button to end the session.  
@@ -245,6 +250,9 @@ npm start
 5. **Search Movies**:
    - Enter a movie name in the search bar.  
    - Click on a movie to view details and decide whether to rent it.
+
+![alt text](image-2.png)
+![alt text](image-3.png)
 ----
 ### AdminPanel
 1. **Logout**: Use the log-out button to end the session.  
@@ -261,6 +269,8 @@ npm start
      - `Production_Company`
    - Use the "Clear Display" button to reset the view.
 4. **SQL Query**: Execute custom SQL queries in the provided query section.
+
+![alt text](image-4.png)
 
 ## Author
 - Romain REQUENA https://github.com/Tailroil
