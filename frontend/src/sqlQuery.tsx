@@ -20,28 +20,27 @@ function SqlQuery(): JSX.Element {
   const handleLogin = (userData: User): void => {
     setUser(userData); 
     setPage(userData.role === 'admin' ? 'admin' : 'user');
-};
+  };
 
-  // Gère la déconnexion
+  // Deconnection
   const handleLogout = (): void => {
-    setUser(null); // Réinitialise les informations utilisateur
-    setPage('login'); // Retourne à la page de connexion
+    setUser(null); 
+    setPage('login');
   };
 
   return (
     <div className="container">
-      {/* Navigation entre les pages */}
       {page === 'login' && (
         <Login onLogin={handleLogin} onSignup={() => setPage('signup')}/>
       )}
       {page === 'signup' && (
-        <Signup onLogin={() => setPage('login')} /> // Retourne à la connexion après l'inscription
+        <Signup onLogin={() => setPage('login')} /> 
       )}
       {page === 'admin' && (
-        <AdminPanel user={user} onLogout={handleLogout} /> // Page admin avec bouton déconnexion
+        <AdminPanel user={user} onLogout={handleLogout} /> 
       )}
       {page === 'user' && user &&(
-        <UserPanel user={user} onLogout={handleLogout} /> // Page user avec bouton déconnexion
+        <UserPanel user={user} onLogout={handleLogout} />
       )}
     </div>
   );

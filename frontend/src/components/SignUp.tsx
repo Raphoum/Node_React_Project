@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-// Définition des props du composant
 interface SignupProps {
-  onLogin: () => void; // Fonction appelée pour retourner à la page de connexion
+  onLogin: () => void; 
 }
 
 const Signup: React.FC<SignupProps> = ({ onLogin }) => {
-  // États locaux avec typage explicite
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [age, setAge] = useState<string>(''); // Toujours une chaîne car provient d'un champ texte
+  const [age, setAge] = useState<string>(''); 
   const [role, setRole] = useState<string>('user');
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
 
-  // Fonction pour gérer l'inscription
   const handleSignup = async (): Promise<void> => {
     if (!name || !email || !age || !role) {
       setError('All fields are required');
@@ -28,7 +25,7 @@ const Signup: React.FC<SignupProps> = ({ onLogin }) => {
       await axios.post('http://localhost:5000/signup', {
         name,
         email,
-        age: parseInt(age, 10), // Convertir l'âge en nombre
+        age: parseInt(age, 10), 
         role,
       });
       setSuccess('Account created successfully!');
@@ -43,7 +40,7 @@ const Signup: React.FC<SignupProps> = ({ onLogin }) => {
       <h1 className="title has-text-centered">Create an Account</h1>
       <div className="box">
         <div className="field">
-          <label className="label">Prenom Nom</label>
+          <label className="label">Firstname Name</label>
           <div className="control">
             <input
               className="input"
@@ -79,7 +76,7 @@ const Signup: React.FC<SignupProps> = ({ onLogin }) => {
           </div>
         </div>
         <div className="field">
-          <label className="label">Password (Role)</label>
+          <label className="label">Password</label>
           <div className="control">
             <input
               className="input"

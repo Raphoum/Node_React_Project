@@ -12,7 +12,7 @@ code {
     monospace;
 }
 .dropdown-menu {
-  width: 100%; /* Prend toute la largeur du champ de recherche */
+  width: 100%;
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -41,7 +41,7 @@ code {
   border-radius: 4px;
 }
 .left-button {
-  text-align: left; /* Aligne le contenu à gauche */
-  margin-left: -20px; /* Décale légèrement vers la gauche */
+  text-align: left;
+  margin-left: -20px; 
 }
 

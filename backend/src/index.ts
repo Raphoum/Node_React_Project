@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import oracledb from 'oracledb';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
 
 const app = express();
 app.use(bodyParser.json());
@@ -39,6 +41,24 @@ interface SQLQueryRequest {
   query: string;
 }
 
+const swaggerOptions = {
+  definition: {
+      openapi: '3.0.0',
+      info: {
+          title: 'Node and React Project API',
+          version: '1.0.0',
+          description: 'REST API documentation for the backend of the Node and React project',
+      },
+  },
+  apis: ['./src/**/*.ts'], // files containing annotations as above
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+console.log('Swagger UI available at http://localhost:5000/api-docs');
+
+
 // Utility function to handle database connections safely
 const closeConnection = async (connection: oracledb.Connection | undefined) => {
   if (connection) {
@@ -51,6 +71,36 @@ const closeConnection = async (connection: oracledb.Connection | undefined) => {
 };
 
 // Update user
+/**
+ * @swagger
+ * /updateuser:
+ *   post:
+ *     summary: Update user information
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               age:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *       400:
+ *         description: All fields (user_id, name, email, age) are required
+ *       404:
+ *         description: User not found or no changes made
+ *       500:
+ *         description: Error updating user
+ */
 app.post('/updateuser', async (req: Request<{}, {}, UserRequest>, res: Response) => {
   const { user_id, name, email, age } = req.body as UserRequest;
   if (!user_id || !name || !email || !age) {
@@ -80,6 +130,34 @@ app.post('/updateuser', async (req: Request<{}, {}, UserRequest>, res: Response)
 });
 
 // Create rental
+/**
+ * @swagger
+ * /rental:
+ *   post:
+ *     summary: Create a new rental
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: number
+ *               movie_id:
+ *                 type: number
+ *               rental_date:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Rental created successfully
+ *       400:
+ *         description: All fields are required
+ *       409:
+ *         description: Movie already rented
+ *       500:
+ *         description: Error creating rental
+ */
 app.post('/rental', async (req: Request<{}, {}, RentalRequest>, res: Response) => {
   const { user_id, movie_id, rental_date } = req.body;
 
@@ -107,6 +185,18 @@ app.post('/rental', async (req: Request<{}, {}, RentalRequest>, res: Response) =
   }
 });
 
+// Fetch rentals
+/**
+ * @swagger
+ * /rental2:
+ *   get:
+ *     summary: Fetch all rentals
+ *     responses:
+ *       200:
+ *         description: A list of rentals
+ *       500:
+ *         description: Error fetching rentals
+ */
 app.get('/rental2', async (req, res) => {
     let connection;
     try {
@@ -141,6 +231,17 @@ app.get('/rental2', async (req, res) => {
   });
 
 // Fetch users
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Fetch all users
+ *     responses:
+ *       200:
+ *         description: A list of users
+ *       500:
+ *         description: Error fetching users
+ */
 app.get('/users', async (_req: Request, res: Response) => {
   let connection;
   try {
@@ -156,6 +257,17 @@ app.get('/users', async (_req: Request, res: Response) => {
 });
 
 // Fetch movies
+/**
+ * @swagger
+ * /movies:
+ *   get:
+ *     summary: Fetch all movies
+ *     responses:
+ *       200:
+ *         description: A list of movies
+ *       500:
+ *         description: Error fetching movies
+ */
 app.get('/movies', async (_req: Request, res: Response) => {
   let connection;
   try {
@@ -175,6 +287,17 @@ app.get('/movies', async (_req: Request, res: Response) => {
 });
 
 // Fetch genres
+/**
+ * @swagger
+ * /genres:
+ *   get:
+ *     summary: Fetch all genres
+ *     responses:
+ *       200:
+ *         description: A list of genres
+ *       500:
+ *         description: Error fetching genres
+ */
 app.get('/genres', async (_req: Request, res: Response) => {
   let connection;
   try {
@@ -190,6 +313,34 @@ app.get('/genres', async (_req: Request, res: Response) => {
 });
 
 // Submit rating
+/**
+ * @swagger
+ * /submit-rating:
+ *   post:
+ *     summary: Submit a rating and review
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: number
+ *               movie_id:
+ *                 type: number
+ *               rating_value:
+ *                 type: number
+ *               review:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Rating and review submitted successfully
+ *       400:
+ *         description: All fields are required
+ *       500:
+ *         description: Error submitting rating
+ */
 app.post('/submit-rating', async (req: Request<{}, {}, RatingRequest>, res: Response) => {
   const { user_id, movie_id, rating_value, review } = req.body;
 
@@ -215,7 +366,18 @@ app.post('/submit-rating', async (req: Request<{}, {}, RatingRequest>, res: Resp
   }
 });
 
-// Endpoint pour les notes (ratings)
+// Endpoint for the ratings
+/**
+ * @swagger
+ * /ratings:
+ *   get:
+ *     summary: Fetch all ratings
+ *     responses:
+ *       200:
+ *         description: A list of ratings
+ *       500:
+ *         description: Error fetching ratings
+ */
 app.get('/ratings', async (req, res) => {
     let connection;
     try {
@@ -235,7 +397,18 @@ app.get('/ratings', async (req, res) => {
     }
   });
   
-  // Endpoint pour les compagnies de production
+  // Endpoint for the production companies
+  /**
+ * @swagger
+ * /production-companies:
+ *   get:
+ *     summary: Fetch all production companies
+ *     responses:
+ *       200:
+ *         description: A list of production companies
+ *       500:
+ *         description: Error fetching production companies
+ */
   app.get('/production-companies', async (req, res) => {
     let connection;
     try {
@@ -256,7 +429,18 @@ app.get('/ratings', async (req, res) => {
   });
 
 
-// Endpoint pour les relations entre films et genres
+// Endpoint for the movie genres
+/**
+ * @swagger
+ * /movie-genres:
+ *   get:
+ *     summary: Fetch all movie genres
+ *     responses:
+ *       200:
+ *         description: A list of movie genres
+ *       500:
+ *         description: Error fetching movie genres
+ */
 app.get('/movie-genres', async (req, res) => {
     let connection;
     try {
@@ -277,7 +461,33 @@ app.get('/movie-genres', async (req, res) => {
     }
   });
 
-// Login endpoint
+// Login
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: User login
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User logged in successfully
+ *       400:
+ *         description: Email and password are required
+ *       401:
+ *         description: Invalid email or password
+ *       500:
+ *         description: Error processing login request
+ */
 app.post('/login', async (req: Request<{}, {}, { email: string; password: string }>, res: Response) => {
     const { email, password } = req.body;
   
@@ -295,13 +505,10 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
       `;
       const result = await connection.execute(query, [email, password], { outFormat: oracledb.OUT_FORMAT_OBJECT });
   
-      // Vérifiez si `rows` est défini
       if (!result.rows || result.rows.length === 0) {
         return res.status(401).send({ error: 'Invalid email or password' });
       }
-  
-      // Extraire les données utilisateur
-      const user = result.rows[0] as {
+        const user = result.rows[0] as {
         USER_ID: number;
         NAME: string;
         EMAIL: string;
@@ -309,7 +516,6 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
         ROLE: string;
       };
   
-      // Retourne les informations utilisateur
       res.send({
         user_id: user.USER_ID,
         name: user.NAME,
@@ -325,6 +531,37 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
     }
   });
 
+// Signup
+/**
+ * @swagger
+ * /signup:
+ *   post:
+ *     summary: User signup
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               age:
+ *                 type: number
+ *               role:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User created successfully
+ *       400:
+ *         description: All fields (name, email, age, role) are required
+ *       403:
+ *         description: Cannot create an account with the admin email
+ *       500:
+ *         description: Error creating user
+ */
   app.post('/signup', async (req, res) => {
     const { name, email, age, role } = req.body;
   
@@ -332,7 +569,6 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
       return res.status(400).send({ error: 'All fields (name, email, age, role) are required' });
     }
   
-    // Vérifier si l'email est celui de l'administrateur
     if (email.toLowerCase() === 'admin@exemple.com') {
       return res.status(403).send({ error: 'Cannot create an account with the admin email' });
     }
@@ -341,7 +577,6 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
     try {
       connection = await oracledb.getConnection(dbConfig);
   
-      // Vérifier si l'email existe déjà dans la base de données
       const checkQuery = 'SELECT COUNT(*) AS count FROM Users WHERE email = :email';
       const checkResult = await connection.execute(checkQuery, [email], { outFormat: oracledb.OUT_FORMAT_OBJECT });
       if (!checkResult.rows || checkResult.rows.length === 0 || !checkResult.rows[0]) {
@@ -352,9 +587,7 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
         return res.status(400).send({ error: 'Email already exists' });
       }
 
-  
-      // Insérer le nouvel utilisateur dans la table Users
-      const insertQuery = `
+        const insertQuery = `
         INSERT INTO Users (name, email, age, role)
         VALUES (:name, :email, :age, :role)
       `;
@@ -375,8 +608,29 @@ app.post('/login', async (req: Request<{}, {}, { email: string; password: string
   });
   
 
-
 // Execute SQL Query
+/**
+ * @swagger
+ * /execute-sql:
+ *   post:
+ *     summary: Execute a SQL query
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               query:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Query executed successfully
+ *       400:
+ *         description: No SQL query provided
+ *       500:
+ *         description: Error executing query
+ */
 app.post('/execute-sql', async (req: Request<{}, {}, SQLQueryRequest>, res: Response) => {
     const { query } = req.body;
   
@@ -399,8 +653,32 @@ app.post('/execute-sql', async (req: Request<{}, {}, SQLQueryRequest>, res: Resp
     }
   });
   
-  // Delete User
-  app.post('/delete-user', async (req: Request<{}, {}, { user_id: number }>, res: Response) => {
+// Delete User
+/**
+ * @swagger
+ * /delete-user:
+ *   post:
+ *     summary: Delete a user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       400:
+ *         description: User ID is required
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Error deleting user
+ */
+app.post('/delete-user', async (req: Request<{}, {}, { user_id: number }>, res: Response) => {
     const { user_id } = req.body;
   
     if (!user_id) {

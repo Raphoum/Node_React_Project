@@ -108,7 +108,7 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
     } catch (err:any) {
 
       if (err.response?.status === 409) {
-        alert(err.response.data.error); // Affiche "Cet utilisateur a déjà loué ce film actuellement."
+        alert(err.response.data.error); 
       } else {
       setError('Error during the location of the movie.');
       }
@@ -134,7 +134,6 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
     }
   };
 
-   // Fonction pour exécuter une requête SQL
    const executePredefinedQuery = async (query: string) => {
     try {
       setError('');
@@ -146,7 +145,6 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
     } 
   };
 
-  // Submit rating and review
   const submitRating = async (rentalId: any) => {
     try {
       setError('');
@@ -171,7 +169,6 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
     }
   };
 
-  // Fetch movies when searching
   useEffect(() => {
     const fetchMovies = async () => {
       console.log("Recherche déclenchée pour :", movieSearch);
@@ -188,7 +185,6 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
         const response = await axios.post('http://localhost:5000/execute-sql', { query });
         console.log("Réponse reçue du serveur :", response);
   
-        // Mapper les résultats pour uniformiser les clés
         const moviesResult = response.data?.result.map((movie:any) => ({
           movie_id: movie.MOVIE_ID,
           title: movie.TITLE,
@@ -328,7 +324,7 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
       </section>
 
       
-    {/* Requêtes SQL supplémentaires */}
+    {/* Request SQL*/}
     <section className="section">
       <div className="box">
         <button
@@ -364,7 +360,7 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
               `)
           }
         >
-          Meilleur film par genre
+          Best movie by genre
         </button>
         <button
           className="button is-link is-fullwidth"
@@ -381,16 +377,16 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
                   `)
           }
         >
-          Classement des films
+          Ranking of movies
         </button>
       </div>
     </section>
 
-    {/* Résultats de requête */}
+    {/* Results of requests*/}
     {result.length > 0 && (
   <section className="section">
     <div className="box">
-      <h2 className="subtitle">Résultats</h2>
+      <h2 className="subtitle">Results</h2>
       <table className="table is-striped is-fullwidth">
         <thead>
           <tr>
@@ -474,10 +470,10 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
                     <em>{movie.tagline || 'Pas de tagline'}</em>
                   </p>
                   <p>
-                    Langue : {movie.original_language} | Durée : {movie.runtime} min
+                    Language : {movie.original_language} | Durée : {movie.runtime} min
                   </p>
                   <p>
-                    Note : {movie.vote_average} ({movie.vote_count} votes)
+                    Rating : {movie.vote_average} ({movie.vote_count} votes)
                   </p>
                   <p>Popularity : {movie.popularity}</p>
                 </li>

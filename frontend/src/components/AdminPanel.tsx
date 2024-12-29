@@ -3,6 +3,7 @@ import axios from 'axios';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
+
 interface AdminPanelProps {
   user: User|null;
   onLogout: () => void;
@@ -15,6 +16,7 @@ interface User {
   age: number;
   role:string;
 }
+
 
 interface TableRow {
   [key: string]: any;
