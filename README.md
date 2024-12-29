@@ -323,7 +323,7 @@ Start the backend and navigate to:
 - [Swagger UI](http://localhost:5000/api-docs)
 
 ## Video Presentation
-- [Video](.Node_React_Project\imgWebsite\Presentation_Website_Node_And_React.mp4)
+- [Video](imgWebsite/Presentation_Website_Node_And_React.mp4)
 You have to download the file to see the video because it's too big.
 
 ## Author
