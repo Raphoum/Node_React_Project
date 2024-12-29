@@ -25,7 +25,8 @@
    - [SignUp](#signup)
    - [UserPanel](#userpanel)
    - [AdminPanel](#adminpanel)
-8. [Author](#author)
+8. [API Documentation](#api-documentation)
+9. [Author](#author)
 
 ----
 
@@ -311,6 +312,14 @@ npm start
 4. **SQL Query**: Execute custom SQL queries in the provided query section.
 
 ![alt text](imgWebsite/image-4.png)
+
+## API Documentation
+
+The backend provides a Swagger OpenAPI page for testing and understanding the REST API.
+
+### Access Swagger
+Start the backend and navigate to:
+- [Swagger UI](http://localhost:5000/api-docs)
 
 ## Author
 - Romain REQUENA https://github.com/Tailroil
