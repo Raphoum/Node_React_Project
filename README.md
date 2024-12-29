@@ -156,6 +156,11 @@ We used a dataset with movies and informations about them, and created a databas
 We created tables like `Movie`, `Genre`, `Production_Company`, `Rating`, `Rental`, `Users`, `Movie_Genre` and `Movie_Production_Company`.
 
 We limited our project to the use of only 1000 movies.
+
+You can find all the files needed to implement the database on an app like MySQL Developer in the folder [sqlDeveloper](./sqlDeveloper/).
+The information to connect to Oracle are present at the beginning of the file `index.ts` in the backend.
+You need an Oracle connection for your database. And for the website, you're referencing the password, the user and the connectstring only once at the beginning of the file.
+
 #### Tables
 The Primary and foreign key were added outsite of the creation of the tables.
 ```sql
