@@ -130,7 +130,19 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, onLogout }) => {
       alert('Information updated successfully!');
     } catch (err: any) { 
         console.error(err);
-      setError(err.response?.data?.error || 'Error updating information.');
+        if (err.response?.status === 404) {
+          alert(err.response.data.error); 
+        }
+        if (err.response?.status === 400) {
+          alert(err.response.data.error); 
+        }
+        if (err.response?.status === 500) {
+          alert(err.response.data.error); 
+        }
+        else {
+          alert('Information updated successfully!');
+          setError(err.response?.data?.error || 'Error updating information.');
+        }
     }
   };
 
