@@ -260,6 +260,9 @@ npm start
 ```
 
 ## Utilisation
+
+When the site is started, at first an error will show, you can close the error with the cross on the top right. This error isn't a real one, because it's not impacting the website.
+
 ### Login
 1. Connect as either a **user** or an **admin**:
     - **User**: Create your own profile or use an existing account:  
